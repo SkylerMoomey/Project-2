@@ -11,6 +11,7 @@
 
 <meta name="author" content="Skyler Moomey" />
 
+<meta name="date" content="2020-12-04" />
 
 <title>Project 2</title>
 
@@ -2806,13 +2807,14 @@ div.tocify {
 
 <h1 class="title toc-ignore">Project 2</h1>
 <h4 class="author">Skyler Moomey</h4>
-<h4 class="date">12/1/2020</h4>
+<h4 class="date">2020-12-04</h4>
 
 </div>
 
 
 <div id="abstract" class="section level1">
 <h1>Abstract</h1>
+<p>The goal of this project is to apply Simple Linear Regression (SLR) to a dataset on cameras. The variables of interest in this study are maximum camera resolution and lowest camera resolution setting. By applying the theoretical underpinnings of SLR to the data, verifying required assumptions about the SLR model, and calculating the extent to which the model fits the data, we verify that there is indeed a positive linear correlation between our variables.</p>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -2863,22 +2865,22 @@ g</code></pre>
 <p>Consider <span class="math inline">\(y_i\)</span>, the value of a dependent variable in the sample.</p>
 <p>We can describe <span class="math inline">\(y_i\)</span> as:</p>
 <p><span class="math display">\[
-\begin{equation*}
+\begin{equation}
   \begin{split}
   y_i &amp;= \beta_0 + \beta_1 x_i + \epsilon_i
   \end{split}
-\end{equation*}
+\end{equation}
 \]</span></p>
 <p>In this view, <span class="math inline">\(\hat y = \beta_0 + \beta_1 x_i\)</span> represents our predictive model, a linear equation, and <span class="math inline">\(\epsilon_i\)</span> is the error term in our model. When we add the error term to <span class="math inline">\(\hat y\)</span>, we recover the true value of our sample datum, <span class="math inline">\(y_i = \hat y_i + \epsilon_i\)</span>. Obviously, <span class="math inline">\(x_i\)</span> will be the dependent variable. <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are unknown constants that we will find values of to minimize our error terms. We know that some amount of error must be present in the model, but according to assumption, <span class="math inline">\(E(\epsilon) = 0\)</span>. This validly applies, as a line running through the center of the data will have error in both the positive and negative directions. If the line is a good fit, the mean value of these error terms will be zero. As such,</p>
 <p><span class="math display">\[
-\begin{equation*}
+\begin{equation}
   \begin{split}
   E(y) = \bar y &amp;= E(\beta_0 + \beta_1 x_i + \epsilon_i)\\
   &amp; = E(\beta_0) + E(\beta_1 x_i) + E(\epsilon_i)\\
   &amp; = \beta_0 + \beta_1 \bar x + 0 \\
   &amp; = \beta_0 + \beta_1 \bar x
   \end{split}
-\end{equation*}
+\end{equation}
 \]</span> Thus, we can see that <span class="math inline">\(\bar y\)</span> is in terms of <span class="math inline">\(\bar x\)</span>, an unbiased estimator, so we use this equation as a point estimate of <span class="math inline">\(y\)</span> at each datum.</p>
 <div id="equation" class="section level2">
 <h2>Equation</h2>
@@ -2890,9 +2892,9 @@ summary(lin.mod)$coef</code></pre>
 ## Low.resolution   0.9490141  0.01175085 80.76130  0.000000e+00</code></pre>
 <p>Finally, in creating our linear model, we use the method of least squares built in to the R function lm(). This creates an equation such that error terms are minimized based on its SSR (sum of squares of residuals). The function estimates them to a <span class="math inline">\(95 \%\)</span> confidence. we find <span class="math inline">\(\hat \beta_0 = 720.1612\)</span> and <span class="math inline">\(\hat \beta_1 = 0.9490\)</span>. Our p-values for both estimators are infinitesimally small, so we can assume that they are validly estimated. Our final equation is</p>
 <p><span class="math display">\[
-\begin{equation*}
+\begin{equation}
 y_i = 720.1612 + 0.9490 x_i
-\end{equation*}
+\end{equation}
 \]</span></p>
 </div>
 </div>
