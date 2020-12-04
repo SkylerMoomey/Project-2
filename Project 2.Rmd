@@ -77,7 +77,7 @@ $$
 \end{equation*}
 $$
 
-In this view, $\hat y = \beta_0 + \beta_1 x_i$ represents our predictive model, a linear equation, and $\epsilon_i$ is the error term in our model. When we add the error term to $\hat y$, we recover the true value of our sample datum, $y_i = \hat y_i + \epsilon_i$. Obviously, $x_i$ will be the dependent variables. $\beta_0$ and $\beta_1$ are unknown constants that we will find values of to minimize our error terms. We know that some amount of error must be present in the model, but according to assumption, $E(\epsilon) = 0$. This validly applies to our model, as a line running through the center of the data will have error in both the positive and negative directions. If the line is a good fit, the mean value of these error terms will be zero. As such,
+In this view, $\hat y = \beta_0 + \beta_1 x_i$ represents our predictive model, a linear equation, and $\epsilon_i$ is the error term in our model. When we add the error term to $\hat y$, we recover the true value of our sample datum, $y_i = \hat y_i + \epsilon_i$. Obviously, $x_i$ will be the dependent variable. $\beta_0$ and $\beta_1$ are unknown constants that we will find values of to minimize our error terms. We know that some amount of error must be present in the model, but according to assumption, $E(\epsilon) = 0$. This validly applies, as a line running through the center of the data will have error in both the positive and negative directions. If the line is a good fit, the mean value of these error terms will be zero. As such,
 
 $$
 \begin{equation*}
@@ -90,6 +90,22 @@ $$
 \end{equation*}
 $$
 Thus, we can see that $\bar y$ is in terms of $\bar x$, an unbiased estimator, so we use this equation as a point estimate of $y$ at each datum.
+
+## Equation
+
+```{r}
+lin.mod <- with(camera_dt, lm(Max.resolution~Low.resolution))
+
+summary(lin.mod)$coef
+```
+
+Finally, in creating our linear model, we use the method of least squares built in to the R function lm(). This creates an equation such that error terms are minimized based on its SSR (sum of squares of residuals). The function estimates them to a $95 \%$ confidence. we find $\hat \beta_0 = 720.1612$ and $\hat \beta_1 = 0.9490$. Our p-values for both estimators are infinitesimally small, so we can assume that they are validly estimated. Our final equation is
+
+$$
+\begin{equation*}
+y_i = 720.1612 + 0.9490 x_i
+\end{equation*}
+$$
 
 # Assumptions
 
@@ -113,8 +129,6 @@ As can be seen from applying a straight to the data, it does appear that a linea
 The second assumption for SLR is that the residuals, that is, the error terms in a linear model, are independent. For this to be the case, there should not be a steady increase or decrease in the length of the residuals over the course of the data, which would imply that early residuals are affecting later residuals.
 
 ```{r}
-res <- residuals(lin.mod)
-
 with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2))
 
 maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
@@ -143,15 +157,88 @@ normcheck(lin.mod, shapiro.wilk = TRUE)
 title("Normal Distribution")
 ```
 
-
-
-## Regression Model
-
-
-
 # Analysis of Data
 
+A model's $R^2$ is the ratio of RSS (residual sum of squares) to TSS (total sum of squares). The closer an $R^2$ value to 1, the better the model fits the data. The third value of concern is MSS (mean sum of squares), due to the equation $TSS = MSS + RSS$. As such, for $MSS/TSS=1$, $RSS$ to be minimized as much as possible.
+
+## RSS
+
+The Residual Sum of Squares can be visualized with the previous figure, that of the data points and their distance from the regression line. We represent the figure here, for convenience.
+
+```{r}
+res <- residuals(lin.mod)
+
+
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2, main="Residual Sum of Squares Visualization"))
+
+maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, maxhat, col="red"))
+
+abline(lin.mod)
+```
+
+The formula for calculating RSS is given by $RSS=\sum_{1}^{n}(y_i - \hat y_i)^2 = \sum_{1}^{n}\epsilon_i^2$. This turns out to be,
+
+```{r}
+RSS = with(camera_dt, sum((maxhat - Max.resolution)^2))
+RSS
+```
+
+## MSS
+
+MSS (mean sum of squares) can be visualized as the distance of the mean of the sample $y_i's$ from the mean of the population, estimated using the linear model. It can be visualized with the following graph.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Mean Sum of Squares Visualization"))
+
+
+with(camera_dt, segments(Low.resolution, mean(Max.resolution), Low.resolution, maxhat, col="light green"))
+
+abline(lin.mod)
+abline(h=mean(camera_dt$Max.resolution))
+```
+
+The value of MSS is defined to be $MSS=\sum_{1}^{n}(\bar y - \hat y)^2$. We calculate MSS for our model as,
+
+```{r}
+MSS = with(camera_dt, sum((maxhat - mean(Max.resolution))^2))
+MSS
+```
+
+
+## TSS
+
+Finally, TSS (total sum of squares), can be visualized as the distance from each $y_i$ from $\bar y$. Graphically, it can be shown as,
+
+```{r}
+
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Total Sum of Squares Visualization"))
+
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, mean(Max.resolution), col="green"))
+
+abline(h=mean(camera_dt$Max.resolution))
+```
+
+The formula for TSS is $MSS = \sum_{1}^{n}(y_i - \bar y)^2$. The value we calculate for TSS is,
+
+```{r}
+TSS = with(camera_dt, sum((Max.resolution - mean(Max.resolution))^2))
+TSS
+```
+
+Finally, we have everything we need to calculate $R^2$.
+
+```{r}
+R2=MSS/TSS
+R2
+```
+
+Our $R^2$ being this close to $1$ shows that our model is a very close fit to the data.
+
+
 # Conclusion
+
+Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however, it seems probable that a company creating a high resolution camera would want to maintain this high resolution by scaling its lowest resolution setting up accordingly.
 
 # References
 
