@@ -17,4 +17,143 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Abstract
 
+# Introduction
+
+## The Data
+
+```{r}
+camera_dt <- read.csv("camera_dataset.csv");
+head(camera_dt[,3:4])
+```
+
+
+The data I am using come from a Kaggle dataset on 1038 different camera models, which include the variables max resolution and low-resolution settings. These variables describe the maximum resolution in pixels of a photo that a camera is capable of taking and the lowest resolution setting of the camera. My statistical hypothesis is that the maximum resolution will increase without a comparable increase in the lowest resolution of the camera software, and I will be using a SLR to determine whether there actually is a statistical relationship between the variables.
+
+## Data Cleaning
+
+```{r}
+length(camera_dt)
+length(camera_dt$Max.resolution)
+low <- camera_dt$Low.resolution
+
+camera_dt <- camera_dt[low > 0,]
+
+length(camera_dt$Max.resolution)
+
+##removed all values at low=0 due to several of them being outliers
+```
+
+Note: A measure of 0 pixels as a lowest resolution does not have value as a measure. If some camera has a 0 pixel lowest resolution, then no photo would be rendered. For this reason, I am removing all experimental units with a lowest resolution on file of 0 pixels, as this is probably just a stand-in value for an uncertain lowest resolution rating. Therefore, of the 1038 experimental units, only 984 will be used in my study.
+
+## Preliminary Plots and Interpretation of the Data
+
+```{r}
+library (s20x)
+pairs20x(camera_dt[,3:4])
+
+library(ggplot2)
+g = ggplot(camera_dt, aes(y=Max.resolution, x= Low.resolution)) + geom_point()
+g = g + geom_smooth(method = "loess")
+g
+```
+
+Contrary to my hypothesis, it does appear that there is a linear relationship between lowest resolution setting and maximum camera resolution. The data appear to appear to have a linear correlation.
+
+# Theoretical Basis of SLR
+
+A Simple Linear Regression (SLR) is a predictive, probabilistic model for a sample. Since we believe a linear relationship exists between Lowest Camera Resolution setting and Maximum Camera Resolution, we can create an equation of a line to estimate values of Maximum Camera Resolution, our dependent variable. Letting $y$ represent maximum resolution and $x$ represent lowest resolution setting, we create the following equation:
+
+Consider $y_i$, the value of a dependent variable in the sample.
+
+We can describe $y_i$ as:
+
+$$
+\begin{equation*}
+  \begin{split}
+  y_i &= \beta_0 + \beta_1 x_i + \epsilon_i
+  \end{split}
+\end{equation*}
+$$
+
+In this view, $\hat y = \beta_0 + \beta_1 x_i$ represents our predictive model, a linear equation, and $\epsilon_i$ is the error term in our model. When we add the error term to $\hat y$, we recover the true value of our sample datum, $y_i = \hat y_i + \epsilon_i$. Obviously, $x_i$ will be the dependent variables. $\beta_0$ and $\beta_1$ are unknown constants that we will find values of to minimize our error terms. We know that some amount of error must be present in the model, but according to assumption, $E(\epsilon) = 0$. This validly applies to our model, as a line running through the center of the data will have error in both the positive and negative directions. If the line is a good fit, the mean value of these error terms will be zero. As such,
+
+$$
+\begin{equation*}
+  \begin{split}
+  E(y) = \bar y &= E(\beta_0 + \beta_1 x_i + \epsilon_i)\\
+  & = E(\beta_0) + E(\beta_1 x_i) + E(\epsilon_i)\\
+  & = \beta_0 + \beta_1 \bar x + 0 \\
+  & = \beta_0 + \beta_1 \bar x
+  \end{split}
+\end{equation*}
+$$
+Thus, we can see that $\bar y$ is in terms of $\bar x$, an unbiased estimator, so we use this equation as a point estimate of $y$ at each datum.
+
+# Assumptions
+
+For an SLR to be a valid linear model, four assumptions about the data must be met:
+
+## Linear Relationship
+
+The first assumption of an SLR is that there is a linear relationship between the independent and dependent variables. As we can see based on our loess plot, there appears to be a roughly linear relationship between Low.resolution and Max.resolution. To assure ourselves of this fact, we apply a straight line to the data.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution, bg="Red",pch=23, cex=1.2, ylim=c(0,1.2*max(Max.resolution)), xlim=c(0,1.2*max(Max.resolution)), main="Scatter Plot and Linear Model of Max v. Low Resolution"))
+
+lin.mod <- with(camera_dt, lm(Max.resolution~Low.resolution))
+abline(lin.mod)
+```
+
+As can be seen from applying a straight to the data, it does appear that a linear relationship is present between the variables, though we will perform more analyses to determine the model's predictive accuracy.
+
+## Linear Independence of Residuals
+
+The second assumption for SLR is that the residuals, that is, the error terms in a linear model, are independent. For this to be the case, there should not be a steady increase or decrease in the length of the residuals over the course of the data, which would imply that early residuals are affecting later residuals.
+
+```{r}
+res <- residuals(lin.mod)
+
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2))
+
+maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, maxhat, col="red"))
+
+abline(lin.mod)
+```
+
+As we can see from our graph (residuals in red), there does not seem to be a constant increase or decrease in the length of our residuals. For this reason, we can assume that they are independently distributed.
+
+## Constant Variance (Homoscedasticity)
+
+The third assumption that must be met for a linear model to be an accurate predictor of a population is that the residuals have a constant variance throughout the sample and be distributed around a mean of zero. This can be determined by making a graph that matches our fitted $\hat y$ estimates to the true values in the sample.
+
+```{r}
+plot(lin.mod, which=1)
+```
+As we can see from the Residuals v. Fitted plot, our errors are likely normally distributed since they seem to have an almost constant slope through the x-axis. Our linear model is supported as a model of best-fit for the data.
+
+## Normality
+
+The final assumption that must be met for a SLR model to be valid is normality of the distribution of the residuals. This can also be verified using the previous plot, as a constant distribution about 0 implies that our residuals are normally distributed. To visualize this better, we can also examine a Q-Q plot of the residuals (Shapiro-Wilk Normality Test).
+
+```{r}
+normcheck(lin.mod, shapiro.wilk = TRUE)
+title("Normal Distribution")
+```
+
+
+
+## Regression Model
+
+
+
+# Analysis of Data
+
+# Conclusion
+
+# References
+
+https://www.kaggle.com/crawford/1000-cameras-data/ 
+Website from which sample data were drawn.
