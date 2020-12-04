@@ -1,0 +1,267 @@
+---
+title: "Project 2"
+author: "Skyler Moomey"
+date: "12/4/2020"
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Correlation of Maximum Camera Resolution and Lowest Resolution Settings in Various Camera Models
+
+This project examines the maximum resolution capabilities of various cameras and determines whether the lowest resolution setting for the camera software was scaled up to meet the maximum resolution. 
+
+## Introduction and Data
+
+```{r}
+camera_dt <- read.csv("camera_dataset.csv");
+head(camera_dt[,3:4])
+```
+
+
+The data I am using come from a Kaggle dataset on 1038 different camera models, which include the variables max resolution and low-resolution settings. These variables describe the maximum resolution in pixels of a photo that a camera is capable of taking and the lowest resolution setting of the camera. My statistical hypothesis is that the maximum resolution will increase without a comparable increase in the lowest resolution of the camera software, and I will be using a SLR to determine whether there actually is a statistical relationship between the variables.
+
+## Data Cleaning
+
+```{r}
+length(camera_dt)
+length(camera_dt$Max.resolution)
+low <- camera_dt$Low.resolution
+
+camera_dt <- camera_dt[low > 0,]
+
+length(camera_dt$Max.resolution)
+
+##removed all values at low=0 due to several of them being outliers
+```
+
+Note: A measure of 0 pixels as a lowest resolution does not have value as a measure. If some camera has a 0 pixel lowest resolution, then no photo would be rendered. For this reason, I am removing all experimental units with a lowest resolution on file of 0 pixels, as this is probably just a stand-in value for an uncertain lowest resolution rating. Therefore, of the 1038 experimental units, only 984 will be used in my study.
+
+## Preliminary Plots and Interpretation of the Data
+
+```{r}
+library (s20x)
+pairs20x(camera_dt[,3:4])
+
+library(ggplot2)
+g = ggplot(camera_dt, aes(y=Max.resolution, x= Low.resolution)) + geom_point()
+g = g + geom_smooth(method = "loess")
+g
+```
+
+## Preliminary Plots and Interpretation of the Data (con't)
+
+From a quick visual glance at the data, it does appear that there is a linear relationship between lowest resolution setting and maximum camera resolution. The data appear to appear to have a linear correlation.
+
+## Theoretical Basis of SLR
+
+A Simple Linear Regression (SLR) is a predictive, probabilistic model for a sample. Since we believe a linear relationship exists between Lowest Camera Resolution setting and Maximum Camera Resolution, we can create an equation of a line to estimate values of Maximum Camera Resolution, our dependent variable. 
+
+## Theoretical Basis of SLR (con't)
+Letting $y$ represent maximum resolution and $x$ represent lowest resolution setting, we create the following equation:
+
+Consider $y_i$, the value of a dependent variable in the sample.
+
+We can describe $y_i$ as:
+
+$$
+\begin{equation}
+  \begin{split}
+  y_i &= \beta_0 + \beta_1 x_i + \epsilon_i
+  \end{split}
+\end{equation}
+$$
+
+- In this view, $\hat y = \beta_0 + \beta_1 x_i$ represents our predictive model. 
+
+- $\epsilon_i$ is the error term in our model. 
+
+- When we add the error term to $\hat y$, we recover the true value of our sample datum, $y_i = \hat y_i + \epsilon_i$. 
+
+-$E(\epsilon) = 0$.
+
+## Theoretical Basis of SLR (con't)
+$$
+\begin{equation}
+  \begin{split}
+  E(y) = \bar y &= E(\beta_0 + \beta_1 x_i + \epsilon_i)\\
+  & = E(\beta_0) + E(\beta_1 x_i) + E(\epsilon_i)\\
+  & = \beta_0 + \beta_1 \bar x + 0 \\
+  & = \beta_0 + \beta_1 \bar x
+  \end{split}
+\end{equation}
+$$
+Thus, we can see that $\bar y$ is in terms of $\bar x$, an unbiased estimator, so we use this equation as a point estimate of $y$ at each datum.
+
+## Equation
+
+```{r}
+lin.mod <- with(camera_dt, lm(Max.resolution~Low.resolution))
+
+summary(lin.mod)$coef
+```
+
+Finally, in creating our linear model, we use the method of least squares built in to the R function lm(). This creates an equation such that error terms are minimized based on its SSR (sum of squares of residuals). The function estimates them to a $95 \%$ confidence. we find $\hat \beta_0 = 720.1612$ and $\hat \beta_1 = 0.9490$. Our p-values for both estimators are infinitesimally small, so we can assume that they are validly estimated. Our final equation is
+
+$$
+\begin{equation}
+y_i = 720.1612 + 0.9490 x_i
+\end{equation}
+$$
+
+## Assumptions
+
+For an SLR to be a valid linear model, four assumptions about the data must be met:
+
+## Linear Relationship
+
+To assure ourselves of a linear relationship between the data points, we apply a straight line to the data.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution, bg="Red",pch=23, cex=1.2, ylim=c(0,1.2*max(Max.resolution)), xlim=c(0,1.2*max(Max.resolution)), main="Scatter Plot and Linear Model of Max v. Low Resolution"))
+
+lin.mod <- with(camera_dt, lm(Max.resolution~Low.resolution))
+abline(lin.mod)
+```
+
+As can be seen from applying a straight to the data, it does appear that a linear relationship is present between the variables, though we will perform more analyses to determine the model's predictive accuracy.
+
+## Linear Independence of Residuals
+
+-The second assumption for SLR is that the residuals are independent.
+
+-As seen, no steady increase or decrease in residual length
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2))
+
+maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, maxhat, col="red"))
+
+abline(lin.mod)
+```
+
+## Constant Variance
+
+-$V(\epsilon) = \sigma^2$ (constant)
+```{r}
+plot(lin.mod, which=1)
+```
+
+## Normality
+
+-From previous plot, $E(\epsilon) \approx 0$. 
+
+-Constant variance. -> Normal Distribution
+
+-Better visualization: Shapiro-Wilk Normality Test.
+```{r}
+normcheck(lin.mod, shapiro.wilk = TRUE)
+title("Normal Distribution")
+```
+
+## Analysis of Data
+
+A model's $R^2$ is the ratio of RSS (residual sum of squares) to TSS (total sum of squares). The closer an $R^2$ value to 1, the better the model fits the data. The third value of concern is MSS (mean sum of squares), due to the equation $TSS = MSS + RSS$. As such, for $MSS/TSS=1$, $RSS$ to be minimized as much as possible.
+
+## RSS
+
+The Residual Sum of Squares can be visualized as the data points and their distance from the regression line.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2, main="Residual Sum of Squares Visualization"))
+
+maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, maxhat, col="red"))
+
+abline(lin.mod)
+```
+
+## RSS (con't)
+
+-Formula: given by $RSS=\sum_{1}^{n}(y_i - \hat y_i)^2 = \sum_{1}^{n}\epsilon_i^2$.
+
+-$RSS = 72772306$.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="black", pch=21,cex=1.2, main="Residual Sum of Squares Visualization"))
+
+maxhat = with(camera_dt, predict(lin.mod, data.frame(Low.resolution)))
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, maxhat, col="red"))
+
+abline(lin.mod)
+```
+
+## MSS
+
+MSS (mean sum of squares) can be visualized as the distance of the mean of the sample $y_i's$ from the mean of the population, estimated using the linear model.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Mean Sum of Squares Visualization"))
+
+
+with(camera_dt, segments(Low.resolution, mean(Max.resolution), Low.resolution, maxhat, col="light green"))
+
+abline(lin.mod)
+abline(h=mean(camera_dt$Max.resolution))
+```
+
+## MSS (con't)
+
+-Formula: $MSS=\sum_{1}^{n}(\bar y - \hat y)^2$.
+
+-$MSS = 483349426$.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Mean Sum of Squares Visualization"))
+
+
+with(camera_dt, segments(Low.resolution, mean(Max.resolution), Low.resolution, maxhat, col="light green"))
+
+abline(lin.mod)
+abline(h=mean(camera_dt$Max.resolution))
+```
+
+
+## TSS
+
+TSS (total sum of squares), can be visualized as the distance from each $y_i$ from $\bar y$.
+
+```{r}
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Total Sum of Squares Visualization"))
+
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, mean(Max.resolution), col="green"))
+
+abline(h=mean(camera_dt$Max.resolution))
+MSS = with(camera_dt, sum((maxhat - mean(Max.resolution))^2))
+```
+
+-Formula for TSS is $TSS = \sum_{1}^{n}(y_i - \bar y)^2$. 
+
+-$TSS=556121733$.
+
+```{r}
+TSS = with(camera_dt, sum((Max.resolution - mean(Max.resolution))^2))
+```
+
+## R-Squared
+
+-Finally, we have everything we need to calculate $R^2 = MSS/TSS$.
+
+-$R^2 = \frac{483,349,426}{556,121,733} = 0.8691$
+
+Our $R^2$ being this close to $1$ shows that our model is a very close fit to the data.
+
+
+## Conclusion
+
+Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however, it seems probable that a company creating a high resolution camera would want to maintain this high resolution by scaling its lowest resolution setting up accordingly.
+
+# References
+
+https://www.kaggle.com/crawford/1000-cameras-data/ 
+
+Website from which sample data were drawn.
