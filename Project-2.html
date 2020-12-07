@@ -11,7 +11,7 @@
 
 <meta name="author" content="Skyler Moomey" />
 
-<meta name="date" content="2020-12-04" />
+<meta name="date" content="2020-12-07" />
 
 <title>Project 2</title>
 
@@ -2807,7 +2807,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Project 2</h1>
 <h4 class="author">Skyler Moomey</h4>
-<h4 class="date">2020-12-04</h4>
+<h4 class="date">2020-12-07</h4>
 
 </div>
 
@@ -2875,13 +2875,13 @@ g</code></pre>
 <p><span class="math display">\[
 \begin{equation}
   \begin{split}
-  E(y) = \bar y &amp;= E(\beta_0 + \beta_1 x_i + \epsilon_i)\\
+  E(y) = \mu_y &amp;= E(\beta_0 + \beta_1 x_i + \epsilon_i)\\
   &amp; = E(\beta_0) + E(\beta_1 x_i) + E(\epsilon_i)\\
-  &amp; = \beta_0 + \beta_1 \bar x + 0 \\
-  &amp; = \beta_0 + \beta_1 \bar x
+  &amp; = \beta_0 + \beta_1 x_i + 0 \\
+  &amp; = \beta_0 + \beta_1 x_i
   \end{split}
 \end{equation}
-\]</span> Thus, we can see that <span class="math inline">\(\bar y\)</span> is in terms of <span class="math inline">\(\bar x\)</span>, an unbiased estimator, so we use this equation as a point estimate of <span class="math inline">\(y\)</span> at each datum.</p>
+\]</span> Therefore, our equation returns the expected value of <span class="math inline">\(y\)</span> in the population for a given <span class="math inline">\(x\)</span>, which is a good estimate of our sample <span class="math inline">\(y\)</span> value.</p>
 <div id="equation" class="section level2">
 <h2>Equation</h2>
 <pre class="r"><code>lin.mod &lt;- with(camera_dt, lm(Max.resolution~Low.resolution))
