@@ -184,7 +184,7 @@ abline(lin.mod)
 The formula for calculating RSS is given by $RSS=\sum_{1}^{n}(y_i - \hat y_i)^2 = \sum_{1}^{n}\epsilon_i^2$. This turns out to be,
 
 ```{r}
-RSS = with(camera_dt, sum((maxhat - Max.resolution)^2))
+RSS = with(camera_dt, sum((Max.resolution - maxhat)^2))
 RSS
 ```
 
@@ -242,7 +242,7 @@ Our $R^2$ being this close to $1$ shows that our model is a very close fit to th
 
 # Conclusion
 
-Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however, it seems probable that a company creating a high resolution camera would want to maintain this high resolution by scaling its lowest resolution setting up accordingly.
+Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however. I assumed that a higher-priced and higher quality camera would allow uses the greater range in camera resolution choices. This, however, is probably not the case.
 
 # References
 

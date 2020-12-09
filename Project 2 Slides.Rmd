@@ -167,7 +167,7 @@ title("Normal Distribution")
 
 ## Analysis of Data
 
-A model's $R^2$ is the ratio of RSS (residual sum of squares) to TSS (total sum of squares). The closer an $R^2$ value to 1, the better the model fits the data. The third value of concern is MSS (mean sum of squares), due to the equation $TSS = MSS + RSS$. As such, for $MSS/TSS=1$, $RSS$ to be minimized as much as possible.
+A model's $R^2$ is the ratio of $MSS$ (mean sum of squares) to $TSS$ (total sum of squares). The closer an $R^2$ value to 1, the more variability in the dependent variable is explained by the model. The third value of concern is RSS (residual sum of squares), due to the identity $TSS = MSS + RSS$. As such, for $MSS/TSS=1$, $RSS$ to be minimized as much as possible.
 
 ## RSS
 
@@ -241,12 +241,19 @@ abline(h=mean(camera_dt$Max.resolution))
 MSS = with(camera_dt, sum((maxhat - mean(Max.resolution))^2))
 ```
 
+## TSS (con't)
+
 -Formula for TSS is $TSS = \sum_{1}^{n}(y_i - \bar y)^2$. 
 
 -$TSS=556121733$.
 
 ```{r}
-TSS = with(camera_dt, sum((Max.resolution - mean(Max.resolution))^2))
+with(camera_dt, plot(Max.resolution~Low.resolution,bg="blue", pch=21,cex=1.2, main="Total Sum of Squares Visualization"))
+
+with(camera_dt, segments(Low.resolution, Max.resolution, Low.resolution, mean(Max.resolution), col="green"))
+
+abline(h=mean(camera_dt$Max.resolution))
+MSS = with(camera_dt, sum((maxhat - mean(Max.resolution))^2))
 ```
 
 ## R-Squared
@@ -260,7 +267,7 @@ Our $R^2$ being this close to $1$ shows that our model is a very close fit to th
 
 ## Conclusion
 
-Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however, it seems probable that a company creating a high resolution camera would want to maintain this high resolution by scaling its lowest resolution setting up accordingly.
+Given the very probable linear relationship between maximum photo resolution and lowest resolution setting, we can assume that in camera manufacturing, the maximum resolution is positively, and linearly, correlated with the lowest resolution setting. This manufacturing choice seems odd, however. I assumed that a higher-priced and higher quality camera would allow uses the greater range in camera resolution choices. This, however, is probably not the case.
 
 # References
 
