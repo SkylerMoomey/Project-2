@@ -23,6 +23,8 @@ The goal of this project is to apply Simple Linear Regression (SLR) to a dataset
 
 # Introduction
 
+![Blackmagic Design Camera](camera.jpeg)
+
 ## The Data
 
 ```{r}
@@ -35,7 +37,7 @@ The data I am using come from a Kaggle dataset on 1038 different camera models, 
 
 ## Data Cleaning
 
-```{r}
+```{r, include=FALSE}
 length(camera_dt)
 length(camera_dt$Max.resolution)
 low <- camera_dt$Low.resolution
@@ -246,3 +248,6 @@ Given the very probable linear relationship between maximum photo resolution and
 
 https://www.kaggle.com/crawford/1000-cameras-data/ 
 Website from which sample data were drawn.
+
+https://www.starkinsider.com/2019/08/blackmagic-design-adds-6k-ef-mount-version-of-the-pocket-cinema-camera.html
+Camera photo

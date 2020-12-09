@@ -15,6 +15,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 This project examines the maximum resolution capabilities of various cameras and determines whether the lowest resolution setting for the camera software was scaled up to meet the maximum resolution. 
 
+![Blackmagic Design Camera](smaller camera.jpg)
+
 ## Introduction and Data
 
 ```{r}
@@ -27,7 +29,7 @@ The data I am using come from a Kaggle dataset on 1038 different camera models, 
 
 ## Data Cleaning
 
-```{r}
+```{r, include=FALSE}
 length(camera_dt)
 length(camera_dt$Max.resolution)
 low <- camera_dt$Low.resolution
@@ -55,7 +57,7 @@ g
 
 ## Preliminary Plots and Interpretation of the Data (con't)
 
-From a quick visual glance at the data, it does appear that there is a linear relationship between lowest resolution setting and maximum camera resolution. The data appear to appear to have a linear correlation.
+From a quick visual glance at the data, it does appear that there is a linear relationship between lowest resolution setting and maximum camera resolution. The data appear to have a linear correlation.
 
 ## Theoretical Basis of SLR
 
@@ -265,3 +267,7 @@ Given the very probable linear relationship between maximum photo resolution and
 https://www.kaggle.com/crawford/1000-cameras-data/ 
 
 Website from which sample data were drawn.
+
+https://www.starkinsider.com/2019/08/blackmagic-design-adds-6k-ef-mount-version-of-the-pocket-cinema-camera.html
+
+Camera photo
